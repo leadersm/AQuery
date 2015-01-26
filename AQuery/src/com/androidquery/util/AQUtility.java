@@ -297,11 +297,10 @@ public class AQUtility {
 		byte[] data = getMD5(str.getBytes());
 		
 		BigInteger bi = new BigInteger(data).abs();
-	
+		
 		String result = bi.toString(36);
 		return result;
 	}
-	
 	
 	private static byte[] getMD5(byte[] data){
 
@@ -321,7 +320,7 @@ public class AQUtility {
 	
     private static final int IO_BUFFER_SIZE = 1024;
     public static void copy(InputStream in, OutputStream out) throws IOException {
-    	//copy(in, out, 0, null, null);
+//    	copy(in, out, 0, null, null);
     	copy(in, out, 0, null);
     }
     
@@ -348,8 +347,8 @@ public class AQUtility {
         }
     	
     }
-    /*
-    public static void copy(InputStream in, OutputStream out, int max, ProgressDialog dialog, ProgressBar bar) throws IOException {
+    
+    /*public static void copy(InputStream in, OutputStream out, int max, ProgressDialog dialog, ProgressBar bar) throws IOException {
        
     	AQUtility.debug("max", max);
     	
@@ -386,8 +385,8 @@ public class AQUtility {
         if(dialog != null) dialog.setProgress(max);
         if(bar != null) bar.setProgress(max);
         
-    }
-*/
+    }*/
+    
     public static byte[] toBytes(InputStream is){
     	
     	byte[] result = null;
@@ -499,7 +498,7 @@ public class AQUtility {
 	
 	
 	private static File makeCacheFile(File dir, String name){
-				
+		
 		File result = new File(dir, name);		
 		return result;
 	}
@@ -507,6 +506,10 @@ public class AQUtility {
 	private static String getCacheFileName(String url){
 		
 		String hash = getMD5Hex(url);
+		return hash;
+	}
+	private static String getCacheFileName(String url,String s){
+		String hash = getMD5Hex(url+s);
 		return hash;
 	}
 	/*
@@ -525,9 +528,28 @@ public class AQUtility {
 		return file;
 	}
 	
+	public static File getCacheFile(File dir, String url,String s){
+		if(url == null) return null;
+		if(url.startsWith(File.separator)){
+			return new File(url);
+		}
+		
+		String name = getCacheFileName(url,s);
+		File file = makeCacheFile(dir, name);
+		return file;
+	}
+	
 	public static File getExistedCacheByUrl(File dir, String url){
 		
 		File file = getCacheFile(dir, url);
+		if(file == null || !file.exists()){
+			return null;
+		}
+		return file;
+	}
+	public static File getExistedCacheByUrl(File dir, String url,String reqParams){
+		
+		File file = getCacheFile(dir, url,reqParams);
 		if(file == null || !file.exists()){
 			return null;
 		}

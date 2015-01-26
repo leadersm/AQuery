@@ -61,6 +61,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
@@ -69,6 +70,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -931,6 +933,16 @@ public abstract class AbstractAQuery<T extends AbstractAQuery<T>> implements Con
 		return self();
 	}
 	
+	public T check(OnCheckedChangeListener listener){
+		
+		if(view instanceof RadioButton){
+			RadioButton rb = (RadioButton) view;
+			rb.setOnCheckedChangeListener(listener);
+		}
+		
+		return self();
+	}
+	
 	/**
 	 * Get checked state of a compound button.
 	 *
@@ -958,6 +970,21 @@ public abstract class AbstractAQuery<T extends AbstractAQuery<T>> implements Con
 		
 		if(view != null){
 			view.setClickable(clickable);
+		}
+		
+		return self();
+	}
+	
+	/**
+	 * Set focusable for a view.
+	 *
+	 * @param focusable
+	 * @return self
+	 */
+	public T focusable(boolean focusable){
+		
+		if(view != null){
+			view.setFocusable(focusable);
 		}
 		
 		return self();
@@ -1982,8 +2009,7 @@ public abstract class AbstractAQuery<T extends AbstractAQuery<T>> implements Con
 	 * @return self
 	 * 
 	 * 
-	 */
-	
+	 */	
 	public <K> T ajax(String url, Map<String, ?> params, Class<K> type, Object handler, String callback){
 		
 		

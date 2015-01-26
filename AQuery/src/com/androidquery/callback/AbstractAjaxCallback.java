@@ -87,12 +87,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Xml;
 import android.view.View;
 
 import com.androidquery.AQuery;
 import com.androidquery.auth.AccountHandle;
-import com.androidquery.auth.GoogleHandle;
 import com.androidquery.util.AQUtility;
 import com.androidquery.util.Common;
 import com.androidquery.util.Constants;
@@ -119,6 +119,17 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 	private WeakReference<Object> progress;
 	
 	private String url;
+	
+	private String reqParams;//lsm add..
+	
+	public String getReqParams() {
+		return reqParams;
+	}
+
+	public void setReqParams(String reqParams) {
+		this.reqParams = reqParams;
+	}
+
 	private Map<String, Object> params;
 	private Map<String, String> headers;
 	private Map<String, String> cookies;
@@ -856,7 +867,8 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 		
 		if(expire < 0) return null;
 		
-		File file = AQUtility.getExistedCacheByUrl(cacheDir, url);
+		File file = TextUtils.isEmpty(reqParams)?AQUtility.getExistedCacheByUrl(cacheDir, url)
+				:AQUtility.getExistedCacheByUrl(cacheDir, url,reqParams);
 		
 		if(file != null && expire != 0){
 			long diff = System.currentTimeMillis() - file.lastModified();	
@@ -1029,7 +1041,11 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 		if(ah != null){
 			return ah.getCacheUrl(url);
 		}
-		return url;
+		
+		if(TextUtils.isEmpty(reqParams))
+			return url;
+		
+		return url+reqParams;
 	}
 	
 	private void fileWork(){
@@ -1108,7 +1124,10 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 	}
 	
 	protected File getCacheFile(){
-		return AQUtility.getCacheFile(cacheDir, getCacheUrl());
+		if(TextUtils.isEmpty(reqParams))
+			return AQUtility.getCacheFile(cacheDir, getCacheUrl());
+		
+		return AQUtility.getCacheFile(cacheDir, getCacheUrl(),reqParams);
 	}
 	
 	
@@ -1129,9 +1148,17 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 			}else if(fileCache){
 				result = getCacheFile();
 			}else{
+				
 				File dir = AQUtility.getTempDir();
-				if(dir == null) dir = cacheDir;
-				result = AQUtility.getCacheFile(dir, url);
+				
+				if(dir == null) 
+					dir = cacheDir;
+				
+				if(TextUtils.isEmpty(reqParams)){
+					result = AQUtility.getCacheFile(dir, url);
+				}else{
+					result = AQUtility.getCacheFile(dir, url, reqParams);
+				}
 			}
 		}
 		
@@ -1623,27 +1650,10 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 		
 		AQUtility.copy(is, os, max, p);
 		
+		is.close();
 		
 	}
 	
-	
-	/**
-	 * Set the authentication type of this request. This method requires API 5+.
-	 *
-	 * @param act the current activity
-	 * @param type the auth type
-	 * @param account the account, such as someone@gmail.com
-	 * @return self
-	 */
-	public K auth(Activity act, String type, String account){
-		
-		if(android.os.Build.VERSION.SDK_INT >= 5 && type.startsWith("g.")){		
-			ah = new GoogleHandle(act, type, account);
-		}
-		
-		return self();
-		
-	}
 	
 	/**
 	 * Set the authentication account handle.
@@ -1876,14 +1886,14 @@ public abstract class AbstractAjaxCallback<T, K> implements Runnable{
 	
 	private static void writeData(DataOutputStream dos, String name, String filename, InputStream is) throws IOException {
 		
-		dos.writeBytes(twoHyphens + boundary + lineEnd);
-		dos.writeBytes("Content-Disposition: form-data; name=\""+name+"\";"
-				+ " filename=\"" + filename + "\"" + lineEnd);
-		dos.writeBytes(lineEnd);
+//		dos.writeBytes(twoHyphens + boundary + lineEnd);
+//		dos.writeBytes("Content-Disposition: form-data; name=\""+name+"\";"
+//				+ " filename=\"" + filename + "\"" + lineEnd);
+//		dos.writeBytes(lineEnd);
 
 		AQUtility.copy(is, dos);
 		
-		dos.writeBytes(lineEnd);
+//		dos.writeBytes(lineEnd);
 		
 	}
 	

@@ -743,7 +743,7 @@ public class BitmapAjaxCallback extends AbstractAjaxCallback<Bitmap, BitmapAjaxC
 			v.setTag(AQuery.TAG_URL, url);
 			
 			if(preset != null && !cacheAvailable(v.getContext())){
-				setBitmap(url, v, preset, true);			
+				setBitmap(url, v, preset, true);
 			}else{
 				
 				setBitmap(url, v, null, true);
